@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, Facebook User: {{ fb_user_id }}</h1>
+    <h2>Connected Pages</h2>
+    {% if pages %}
+        <table border="1">
+            <tr>
+                <th>Page Name</th>
+                <th>Page ID</th>
+                <th>Instagram Business ID</th>
+                <th>WhatsApp Business ID</th>
+                <th>WhatsApp Phone Number ID</th>
+            </tr>
+            {% for page in pages %}
+                <tr>
+                    <td>{{ page.name }}</td>
+                    <td>{{ page.id }}</td>
+                    <td>
+                        {% set ig = instagram_accounts | selectattr('page_id', 'equalto', page.id) | list %}
+                        {{ ig[0].instagram_id if ig else "N/A" }}
+                    </td>
+                    <td>
+                        {% if whatsapp_accounts %}
+                            {{ whatsapp_accounts[0].waba_id if whatsapp_accounts[0].waba_id else "N/A" }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if whatsapp_accounts and whatsapp_accounts[0].phone_numbers %}
+                            {{ whatsapp_accounts[0].phone_numbers[0].id if whatsapp_accounts[0].phone_numbers else "N/A" }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No connected pages found.</p>
+    {% endif %}
+    {% if not whatsapp_accounts %}
+        <p>No WhatsApp accounts found. <a href="/auth/facebook/signup-whatsapp">Set up WhatsApp Business Account</a> or visit <a href="https://business.facebook.com">Meta Business Manager</a>.</p>
+    {% endif %}
+</body>
+</html>
